@@ -40,7 +40,7 @@ int getop(char* s) {
     return VARIABLE;
   }
 
-  if(c >= 'a' && c <= 'z'){
+if(c >= 'a' && c<= 'z' && (c!= 'v' && c!= 'd' && c != 'p' && c!= 'c')){
     i = 0;
     while (isalpha(s[++i] = c = getch_()));
     s[i] = '\0';
@@ -137,6 +137,7 @@ void rpn(void) {
       if ((op2 = pop()) == 0.0) { fprintf(stderr, "mod by zero\n"); break; }
       push(fmod(pop(),op2)); break;//4.3
 
+      case 'c': clear();  break;
       case 'p': printf("\t%.8g", (op2=pop())); push(op2); break; //4.4
       case 'd': op2 = pop(); push(op2); push(op2); break;//4.4
       case '$': op2 = pop(); op1 = pop(); push(op2); push(op1); break; //4.4
