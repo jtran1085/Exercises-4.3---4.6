@@ -92,8 +92,7 @@ void math(char* s){
 
   if(strcmp(s,"pow") == 0){
     op2 = pop();
-    op1 = pop();
-    result = pow(op1,op2);
+    result = pow(pop(),op2);
   }
   else if(strcmp(s,"sin")== 0){
     result = sin(pop());
