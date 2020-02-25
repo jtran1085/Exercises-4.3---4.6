@@ -28,6 +28,11 @@ void ungetch_(int c) {
   buf[bufp++] = c;
 }
 
+void clear(void)
+{
+    sp = 0;
+}
+
 int getop(char* s) {
   int i, c;
   while ((s[0] = c = getch_()) == ' ' || c == '\t') { }  // skip whitespace
@@ -40,7 +45,7 @@ int getop(char* s) {
     return VARIABLE;
   }
 
-if(c >= 'a' && c<= 'z' && (c!= 'v' && c!= 'd' && c != 'p' && c!= 'c')){
+if(c >= 'a' && c<= 'z' && c != 'v'){
     i = 0;
     while (isalpha(s[++i] = c = getch_()));
     s[i] = '\0';
@@ -87,7 +92,7 @@ void var(int va, double var[]){
   }
 }
 
-void math(char* s){
+void math(char* s, double * v){
   double op1, op2, result = 0;
 
   if(strcmp(s,"pow") == 0){
@@ -104,6 +109,7 @@ void math(char* s){
     result = exp(pop());
   }
   else {printf("%s not valid math operator\n", s);}
+  *v = result;
   push(result);
   printf("%.2f\n", result);
 }
@@ -111,19 +117,17 @@ void math(char* s){
 
 void rpn(void) {
   int type,va;
-  double op1,op2, v;
+  double op1,op2, v; 
+  double *ptrv = &v;
   char s[BUFSIZ];
   double variable[26];
   while ((type = getop(s)) != EOF) {
     switch(type) {
-     /* case '=': pop();
-      if(va >= 'A' && va <= 'Z'){var[va-'A'] = pop(); break;}
-      fprintf(stderr, "invalid variable name\n"); break;//4.6
-      */
+
       case '\n':   v = pop(); printf("\t%.8g\n", v);  break;
-      case NUMBER:  push(atof(s));                   break;
-      case VARIABLE: var(va,variable);                    break;
-      case MATH:    math(s);                    break;
+      case NUMBER:  push(atof(s));                    break;
+      case VARIABLE: var(va,variable);                break;
+      case MATH:    math(s,ptrv);                    break;
       case '+':     push(pop() + pop());        break;
       case '*':     push(pop() * pop());        break;
       case '-':     push(-(pop() - pop()));     break;
@@ -136,11 +140,10 @@ void rpn(void) {
       if ((op2 = pop()) == 0.0) { fprintf(stderr, "mod by zero\n"); break; }
       push(fmod(pop(),op2)); break;//4.3
 
-      case 'c': clear();  break;
-      case 'p': printf("\t%.8g", (op2=pop())); push(op2); break; //4.4
-      case 'd': op2 = pop(); push(op2); push(op2); break;//4.4
+      case '~': clear();  break;
+      case '@': printf("\t%.8g", (op2=pop())); push(op2); break; //4.4
+      case '#': op2 = pop(); push(op2); push(op2); break;//4.4
       case '$': op2 = pop(); op1 = pop(); push(op2); push(op1); break; //4.4
-
       default:      
       if(type >= 'A' && type <= 'Z') {push(variable[type- 'A']); break;}
       else if(type == 'v'){push(v); break;}//4.6
