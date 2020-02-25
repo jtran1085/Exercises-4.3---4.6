@@ -124,7 +124,7 @@ void rpn(void) {
   while ((type = getop(s)) != EOF) {
     switch(type) {
 
-      case '\n':   v = pop(); printf("\t%.5g\n", v);  break;
+      case '\n':   v = pop(); printf("\t%.2f\n", v);  break;
       case NUMBER:  push(atof(s));                    break;
       case VARIABLE: var(va,variable);                break;
       case MATH:    math(s,ptrv);                    break;
