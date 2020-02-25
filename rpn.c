@@ -12,13 +12,13 @@
 #include <math.h>
 #include <string.h>
 
+#define VARIABLE 'x'
 #define MAXOP   100    /* max size of operand/operator */
 #define NUMBER '0'     /* signal that a number was found */
 #define MAXVAL  100
 #define MATH 'n'
 size_t sp = 0;   // aka unsigned long -- printf using %zu
 double val[MAXVAL];   // stack of values
-
 char buf[BUFSIZ];
 size_t bufp = 0;
 
@@ -33,13 +33,20 @@ int getop(char* s) {
   while ((s[0] = c = getch_()) == ' ' || c == '\t') { }  // skip whitespace
   s[1] = '\0';
   
-  if(isalpha(c)){
+  if (c == '=' || c == '?'){
+    i = 0;
+    while (isalpha(s[++i] = c = getch_()));
+    s[i] = '\0';
+    return VARIABLE;
+  }
+
+  if(c >= 'a' && c <= 'z'){
     i = 0;
     while (isalpha(s[++i] = c = getch_()));
     s[i] = '\0';
     return MATH;
   }
-
+  
   if (!isdigit(c) && c != '.' && c!='-') { return c; }  // if not a digit, return
 
   i = 0;
@@ -73,6 +80,13 @@ void push(double f) {
   val[sp++] = f;
 }
 
+void var(int va, double var[]){
+  pop();
+  if(va >= 'A' && va <= 'Z') {
+  var[va -'A'] = pop();
+  }
+}
+
 void math(char* s){
   double op1, op2, result = 0;
 
@@ -95,16 +109,21 @@ void math(char* s){
   printf("%.2f\n", result);
 }
 
+
 void rpn(void) {
   int type,va;
   double op1,op2, v;
   char s[BUFSIZ];
-  double var[26];
-
+  double variable[26];
   while ((type = getop(s)) != EOF) {
     switch(type) {
+     /* case '=': pop();
+      if(va >= 'A' && va <= 'Z'){var[va-'A'] = pop(); break;}
+      fprintf(stderr, "invalid variable name\n"); break;//4.6
+      */
       case '\n':   v = pop(); printf("\t%.8g\n", v);  break;
       case NUMBER:  push(atof(s));                   break;
+      case VARIABLE: var(va,variable);                    break;
       case MATH:    math(s);                    break;
       case '+':     push(pop() + pop());        break;
       case '*':     push(pop() * pop());        break;
@@ -122,11 +141,8 @@ void rpn(void) {
       case 'd': op2 = pop(); push(op2); push(op2); break;//4.4
       case '$': op2 = pop(); op1 = pop(); push(op2); push(op1); break; //4.4
 
-      case '=': pop();
-      if(va >= 'A' && va <= 'Z'){var[va-'A'] = pop(); break;}
-      fprintf(stderr, "invalid variable name\n"); break;//4.6
       default:      
-      if(type >= 'A' && type <= 'Z') {push(var[type- 'A']); break;}//4.6
+      if(type >= 'A' && type <= 'Z') {push(variable[type- 'A']); break;}
       else if(type == 'v'){push(v); break;}//4.6
 
       fprintf(stderr, "unknown command %s\n", s);  break;
