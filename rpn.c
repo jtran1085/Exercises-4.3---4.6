@@ -110,8 +110,8 @@ void math(char* s, double * v){
   }
   else {printf("%s not valid math operator\n", s);}
   *v = result;
-  push(result);
-  printf("%.2f\n", result);
+  push(*v);
+  printf("%.2f\n", *v);
 }
 
 
@@ -124,13 +124,13 @@ void rpn(void) {
   while ((type = getop(s)) != EOF) {
     switch(type) {
 
-      case '\n':   v = pop(); printf("\t%.8g\n", v);  break;
+      case '\n':   v = pop(); printf("\t%.5g\n", v);  break;
       case NUMBER:  push(atof(s));                    break;
       case VARIABLE: var(va,variable);                break;
       case MATH:    math(s,ptrv);                    break;
       case '+':     push(pop() + pop());        break;
       case '*':     push(pop() * pop());        break;
-      case '-':     push(-(pop() - pop()));     break;
+      case '-': op2=pop();     push(pop()-op2);     break;
       case '/':
         if ((op2 = pop()) == 0.0) { fprintf(stderr, "divide by zero\n");  break; }
         push(pop() / op2);
